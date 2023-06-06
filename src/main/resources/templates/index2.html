@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居残りメーラー</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+    <div id="app">
+
+
+        <a href="setting.html" id="setting">設定</a>
+        <a href="HowToUse.html" id="HowToUse">使い方</a>
+
+        <h1 id="title">居残りメーラー</h1>
+        
+        <p>残る人</p>
+        <table id ="member">
+            <tr v-for ="user in users">
+                <td><input type="checkbox" name="userSelect" v-bind:value="user.id" :checked="user.selectedFlg === 1"></td>
+                <td>{{user.name}}</td>
+            </tr>
+
+        </table>
+
+
+        <p>理由</p>
+        <select name="reason">
+            <option value="learn">自学自習</option>
+            <option value="develop">グループ開発</option>
+        </select>
+        <br>
+        <br>
+        <br>
+        <br>
+
+     
+        <button type="submit" @click="confirmation">確認</button>
+        <div id="confirmation-area" >
+            <textarea v-model="confirmation" >
+        </div>
+
+
+    </div>
+
+
+        
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script>console.log('test')</script>
+<script>
+    const{ createApp } =Vue
+
+    createApp({
+        data(){
+            return{
+                users:[],
+                isSelected: false,
+                confimation:'',
+                name:['testA','testB','testC'],
+                reason:['example'],
+            }
+        },
+
+        methods:{
+
+            //残る人を取ってくる
+            getUsers(){
+                console.log('getUsersスタート')
+                axios.get('/getUsers')
+                .then(res =>{
+                    this.users = res.data;
+                    console.log(this.users)
+                    for(let i = 0; i < this.users.length ; i++){
+                        if (this.users[i].selectedFlg == 1) {
+                        this.isSelected = true;
+                        console.log(this.users[i])
+                        }else{
+                            this.isSelected = false;
+                        }
+                    }
+            
+                });
+            },
+            confirmation(){
+                // this.name =
+                console.log('confirmationスタート')
+                axios.get('/confirmation')
+                .then(res =>{
+                    this.confirmation = res.data;
+                    console.log(this.confirmation);
+                    
+                })
+            }
+
+        },
+
+        created: function() {
+            console.log('created');
+            this.getUsers();
+            console.log('created');
+        },
+
+        mounted() {
+            console.log('mountedまで来たよ。')
+            for(let i = 0; i < this.users.length ; i++){
+                if (this.users[i].selectedFlg == 1) {
+                this.isSelected = true;
+                console.log(this.users[i])
+                }
+            }
+            
+
+        }
+
+
+    }).mount('#app')
+
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,63 @@
+body{
+    text-align: center;
+}
+
+#member{
+    margin: 0 auto;
+
+}
+
+#setting{
+    /* position: relative; */
+
+    width: 264px;
+    height: 96px;
+    color: #C23A1B;
+}
+
+#HowToUse{
+    /* position: relative; */
+    width: 272px;
+    height: 96px;
+    color: #14AE5C;
+}
+
+#title{
+    /* position: relative; */
+    width: 832px;
+    
+    color: #0D99FF;
+    margin: 0 auto;
+
+}
+
+#confirmation-area{
+    width: 495px;
+    height: 220px;
+}
+
+
+
+.name-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .name-item {
+    margin-right: 10px; 
+    width: 20%;
+    box-sizing: border-box;  
+}
+
+a.btn {
+    color: white;
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+    background-color: #87cefa;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 0px;
+    padding: 5px 20px 5px 20px;
+    text-decoration:none
+  }
