@@ -161,6 +161,7 @@
                     return `mailto:${encodeURIComponent(this.recipient)}?cc=${encodeURIComponent(this.cc1)}&subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(this.template)}`;
 
                 }
+                alert('不正な値（「{{something}}」など）が含まれている可能性があります。適宜訂正してください');
                 return '#'; // メーラーを開かない場合は "#" を返す
 
 
