@@ -1,63 +1,112 @@
-body{
+body {
     text-align: center;
+    font-size: 24px;
+    background-color: #fffdee;
 }
 
-#member{
+#member {
     margin: 0 auto;
-
+    margin-top: 2%;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 4px;
 }
 
-#setting{
-    /* position: relative; */
 
-    width: 264px;
-    height: 96px;
-    color: #C23A1B;
-}
-
-#HowToUse{
-    /* position: relative; */
-    width: 272px;
-    height: 96px;
-    color: #14AE5C;
-}
-
-#title{
-    /* position: relative; */
-    width: 832px;
-    
-    color: #0D99FF;
-    margin: 0 auto;
-
-}
-
-#confirmation-area{
+#confirmation-area {
+    margin-top: 2%;
     width: 495px;
     height: 220px;
 }
 
+#HowToUse, #title {
+    width: 100%;
+    max-width: 832px;
+    margin: 0 auto;
+}
 
+#setting {
+    float: right;
+    display: inline-block;
+    padding: 10px 50px;
+    background-color: hsl(131, 100%, 65%);
+    color:rgb(255, 253, 253) ;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 10px;
+    text-decoration: none;
+}
+#setting:hover {
+    float: right;
+    display: inline-block;
+    padding: 10px 50px;
+    background-color:#10ff44 ;
+    color: rgb(255, 255, 255);
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+#HowToUse {
+    color: #14AE5C;
+}
+
+#title {
+    color: #0D99FF;
+}
 
 .name-container {
     display: flex;
     flex-wrap: wrap;
-  }
-  
-  .name-item {
-    margin-right: 10px; 
+}
+
+.name-item {
+    margin-right: 10px;
+    margin-bottom: 10px;
     width: 20%;
-    box-sizing: border-box;  
+    box-sizing: border-box;
+}
+
+.name-item label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border: 1px solid #a3a3a3;
+    border-radius: 4px;
+    background-color: #e7e7e7;
+    cursor: pointer;
+}
+
+.name-item label input[type="checkbox"] {
+    margin-right: 5px;
 }
 
 a.btn {
-    color: white;
+    display: inline-block;
+    color: rgb(243, 243, 243);
     text-align: center;
     font-size: 21px;
     font-weight: bold;
-    background-color: #87cefa;
+    background-color: #ff9d5c;
     border-radius: 10px;
     cursor: pointer;
-    border: 0px;
-    padding: 5px 20px 5px 20px;
-    text-decoration:none
-  }
+    border: 0;
+    padding: 10px 20px;
+    text-decoration: none;
+}
+
+a.btn:hover{
+    display: inline-block;
+    color:white ;
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+    background-color:#ff7b24 ;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 0;
+    padding: 10px 20px;
+    text-decoration: none;
+}

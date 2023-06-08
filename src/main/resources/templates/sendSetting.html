@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居残りメーラー</title>
+    <link rel="stylesheet" href="/templateSetting.css">
+</head>
+<body>
+    <div id="app">
+
+        <h3>メール送信先設定</h3>
+        <ul>
+            <li>メールアドレスを登録してください</li>
+            <li>削除したいメールアドレスは、そのメールアドレスを消し、登録を押してください</li>
+            <li>ccは5件まで登録できます。登録しない場合は空白のまま登録を押してください。</li>
+        </ul>
+
+        <p>送信相手：<input type="text" v-model="recipient"></p>
+        <p>cc1：<input type="text" v-model="cc1"></p>
+        <p>cc2：<input type="text" v-model="cc2"></p>
+        <p>cc3：<input type="text" v-model="cc3"></p>
+        <p>cc4：<input type="text" v-model="cc4"></p>
+        <p>cc5：<input type="text" v-model="cc5"></p>
+        <p><button type="button" @click="upDateMailInfo">登録</button></p>
+        <a href="/index">メインへ</a><br>
+        <a href="/setting">設定へ戻る</a>
+
+    </div>
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    recipient:'',
+                    cc1:'',
+                    cc2:'',
+                    cc3:'',
+                    cc4:'',
+                    cc5:'',
+
+                }
+            },
+
+            methods: {
+                getMailInfo(){
+                console.log('getMailスタート');
+                axios.get('/getMail')
+                .then(res => {
+                    this.recipient=res.data.mail
+                    for (let i = 1; i <= 5; i++) {
+                        this['cc' + i] = res.data['cc' + i];
+                    }
+                    
+                });
+                },
+
+                upDateMailInfo(){
+                    console.log('updateMailスタート');
+                    for (let i = 1; i <= 5; i++) {
+                        if(this['cc' + i] === ""){
+                            this['cc' + i] =null;
+                        }
+                        
+                    }
+                    const mailInfo={
+                        mail:this.recipient,
+                        cc1:this.cc1,
+                        cc2:this.cc2,
+                        cc3:this.cc3,
+                        cc4:this.cc4,
+                        cc5:this.cc5,
+                    };
+                    console.log(mailInfo)
+                    axios.post('/updateMail',mailInfo)
+                    .then(res => {
+                        this.getMailInfo();
+                    });
+
+                }
+            },
+            created: function() {
+                console.log('created');
+                this.getMailInfo();
+            },
+        }).mount('#app');
+    </script>
+</body>
+</html>

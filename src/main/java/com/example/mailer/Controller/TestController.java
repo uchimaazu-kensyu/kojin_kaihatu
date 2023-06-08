@@ -19,4 +19,30 @@ public class TestController {
         return "index";
     }
 
+    @GetMapping("/setting")
+    public String setting(){
+        return "setting";
+    }
+
+    @GetMapping("/subjectSetting")
+    public String subjectSetting(){
+        return "subjectSetting";
+    }
+
+    @GetMapping("/memberSetting")
+    public String memberSetting(){
+        return "memberSetting";
+    }
+
+
+    @GetMapping("/templateSetting")
+    public String templateSetting(){
+        return "templateSetting";
+    }
+
+    @GetMapping("/sendSetting")
+    public String sendSetting(){
+        return "sendSetting";
+    }
+
 }

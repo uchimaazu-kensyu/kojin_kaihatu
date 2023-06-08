@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,47 +8,27 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-
     <div id="app">
-
-
-
-
-        <h1 id="title">居残りメーラー</h1>
-        
-        <p>残る人</p>
+        <a href="/setting" id="setting">設定</a>
+        <h2 id="title">居残りメーラー</h2>
         <table id="member">
-          <tr>
-            <td>
-              <div class="name-container">
-                <div v-for="user in users" class="name-item">
-                  <input type="checkbox" name="userSelect" v-bind:value="user.id" :checked="user.selectedFlg === 1" @click="selectDetention(user.id)">
-                  {{ user.name }}
-                </div>
-              </div>
-            </td>
-          </tr>
+            <tr>
+                <td>
+                    <div class="name-container">
+                        <div v-for="user in users" class="name-item">
+                            <label>
+                                <input type="checkbox" v-bind:id="user.id" v-bind:value="user.id" :checked="user.selectedFlg === 1" @click="selectDetention(user.id)">
+                                <span>{{ user.name }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </td>
+            </tr>
         </table>
-
-
-        <p>理由
-            <select name="reason" v-model="selectedReason">
-                <option value="自学自習">自学自習</option>
-                <option value="グループ開発">グループ開発</option>
-            </select>
-        </p>
-        
-
-
-     
-        <!-- <p><button type="button" @click="confirmation">確認</button></p> -->
-        
         <div>
             <textarea v-model="template" id="confirmation-area"></textarea>
         </div>
-        <p><a :href="getEmailLink()" class="btn" @click="getEmailLink">メーラー起動</a></p>
-
-
+        <p><a :href="createEmailLink()" class="btn" @click="createEmailLink">メーラー起動</a></p>
     </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -63,13 +43,15 @@
                 detentionMember:[],
                 isSelected: false,
                 template: '',
-                name: ['testA', 'testB', 'testC'],
-                selectedReason:'自学自習',
-                recipient:'miyagi@r-net.co.jp',
                 subject:'',
-                cc1:'okinawa@axiz.co.jp',
-                cc2:'uchimaazu.kensyu@gmail.com',
-
+                recipient:'',
+                cc1:'',
+                cc2:'',
+                cc3:'',
+                cc4:'',
+                cc5:'',
+                ccList:[],
+                
             }
         },
 
@@ -86,6 +68,7 @@
                     this.confirmation();
                 });
             },
+
 
             //最初に表示するようで、selectedFlgが１の奴を、チェックつけておく。
             cheakDetentionMenber(){
@@ -107,15 +90,32 @@
                 .then(res => {
                     const template = res.data.template;
                     this.template = template
-                        .replace('{{reason}}', this.selectedReason)
-                        .replace('{{name}}', this.detentionMember.map(user => user.name).join(', '))
-                        .replace('{{name.length}}', this.detentionMember.length);
+                        .replace(/{{name}}/g, this.detentionMember.map(user => user.name).join(', '))
+                        .replace(/{{numberOfPeople}}/g, this.detentionMember.length);
                     // console.log(this.template);
                     const getSubject =res.data.subject;
-                    this.subject =getSubject+'('+this.detentionMember.length+'名分)';
+                    this.subject =getSubject
+                        .replace(/{{numberOfPeople}}/g, this.detentionMember.length)
+                        .replace(/{{name}}/g, this.detentionMember.map(user => user.name).join(', '))
+
                 })
             },
 
+            getMail() {
+                console.log('getMailスタート');
+                axios.get('/getMail')
+                    .then(res => {
+                    this.recipient = res.data.mail;
+                    for (let i = 1; i <= 5; i++) {
+                        const cc = res.data['cc' + i];
+                        if (cc !== null) {
+                            this.ccList.push(cc);
+                        }
+                        this['cc' + i] = cc;
+                    }
+                    console.log('ccList' + this.ccList);
+                });
+            },
             //チェックボックスが押されたら起動。
             //selectedFlgが１なら０、０なら１に。
             selectDetention(id){
@@ -140,28 +140,24 @@
 
             
 
-            // handleEmailLinkClick(event) {
-            //     const text = this.template;
-            //     const result = text.match(/^\d{3}-?\d{4}$/);
 
-            //     if (result === null) {
-            //         console.log('だめ。');
-            //         alert('正しい形式のテキストを入力してください。');
-            //         event.preventDefault(); // ダイアログが表示された場合は、リンクを無効にするためにイベントのデフォルトの挙動をキャンセル
-            //     }
-            // },
-
-            getEmailLink() {
+            createEmailLink() {
                 const text = this.template;
                 const pattern = /{{[^{}]+}}/g;
+                const pattern2 = 'undefined';
+                const pattern3 = 'null';
                 const result = text.match(pattern);
-                console.log(result);
+                const result2 = text.match(pattern2);
+                const result3 = text.match(pattern3);
                 
-                if (result === null) {
-                    return `mailto:${encodeURIComponent(this.recipient)}?cc=${encodeURIComponent(this.cc1)}&subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(this.template)}`;
+                if (result===null && result2===null &&result3 === null) {
+                    let ccParams = this.ccList.map(cc => `${encodeURIComponent(cc)}`).join(',');
+                    let mailtoLink = `mailto:${encodeURIComponent(this.recipient)}?cc=${ccParams}&subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(this.template)}`;
+                    return mailtoLink;
+                    // return `mailto:${encodeURIComponent(this.recipient)}?cc=${encodeURIComponent(this.cc1)}&subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(this.template)}`;
 
                 }
-                alert('不正な値（「{{something}}」など）が含まれている可能性があります。適宜訂正してください');
+                alert('不正な値（「{{something}}」、null、undefinedなど）が含まれている可能性があります。適宜訂正してください');
                 return '#'; // メーラーを開かない場合は "#" を返す
 
 
@@ -170,37 +166,29 @@
 
         },
 
-        watch: {
-            // 問題内容が変更されるたびに、関数が実行されます。
-            selectedReason(newData, oldData) {
-                console.log('watchやで')
-                console.log(this.selectedReason)
-                this.confirmation();
-            }
-        },
+        // watch: {
+        //     // 内容が変更されるたびに、関数が実行されます。
+        //     selectedReason(newData, oldData) {
+        //         console.log('watchやで')
+        //         console.log(this.selectedReason)
+        //         this.confirmation();
+        //     }
+        // },
 
         created: function() {
             console.log('created');
             this.getUsers();
+            this.getMail();
 
             
         },
 
 
         computed: {
-            // getEmailLink(){
-            //     return `mailto:${encodeURIComponent(this.recipient)}?cc=${encodeURIComponent(this.cc1)}&subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(this.template)}`;
-            // }
+
             
         },
-        // watch: {
-        //     // 問題内容が変更されるたびに、関数が実行されます。
-        //     question(newQuestion, oldQuestion) {
-                
-        //             this.confirmation();
-                
-        //     }
-        // },
+
 
 
         mounted() {

@@ -1,0 +1,50 @@
+body {
+    font-size:16px;
+    text-align: center;
+    background-color: #fffdee;
+
+}
+
+#title {
+    font-size: 32px;
+    color: #242849;
+    margin-bottom: 20px;
+}
+
+.menu-container {
+    margin-top: 40px;
+}
+
+.menu-list {
+    padding: 0;
+}
+
+.menu-list li {
+    margin-bottom: 10px;
+}
+
+a {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #337ab7;
+    background-color: aliceblue;
+}
+
+#top-button {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+    background-color: #eb7221;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 0;
+    padding: 10px 20px;
+    text-decoration: none;
+}
+
+ol,ul{
+    padding: 0;
+}
