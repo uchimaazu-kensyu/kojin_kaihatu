@@ -1,0 +1,56 @@
+body {
+    font-size: 16px;
+    text-align: center;
+    background-color: #fffdee;
+
+}
+
+#title {
+    margin-top: 10px;
+}
+
+.name-cheak-edit {
+    font-size: 22px;
+    margin-top: 5%;
+    width: 50%;
+    padding-left: 30%;
+}
+
+#add-edit-area {
+    /* display: flex;
+    justify-content: center; */
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 30px;
+    width:50%;
+    padding-right: 5%;
+
+}
+
+#member {
+    margin: 0 auto;
+}
+
+
+
+.wrapper{
+    display: flex;
+    justify-content: center;
+}
+
+#add-area {
+    /* margin-right: 5%; */
+    width: 60%;
+}
+
+#edit-area {
+    /* margin-left: 5%; */
+    width: 60%;
+}
+
+a {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #337ab7;
+}

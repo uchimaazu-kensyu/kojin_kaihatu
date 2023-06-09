@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居残りメーラー</title>
+    <link rel="stylesheet" href="/templateSetting.css">
+</head>
+<body>
+    <div id="app">
+        <h2>テンプレート設定</h2>
+        <ul>
+            <li><h3>テンプレのいじり方説明</h3></li>
+            <li>基本的に適当に書いてもらってかまいません</li>
+            <li>残る人の名前を入れたいところに<span style="color:rgb(114, 180, 224)">{{'{{'}}name}}</span>と入力</li>
+            <li>残る人数を入れたいところに<span style="color:rgb(114, 180, 224)">{{'{{'}}numberOfPeople}}</span>と入力してください。</li>
+            <li>（スペース等があってもうまく動作しませんのでご注意ください。）</li>
+            <li>1000文字まで登録できます</li>
+            <li>サンプルにどのように件名に表示されるのか確認できるので、参考にしてください。名前はダミーです。</li>
+            <li>最初の状態に戻したい場合には、「reset」のみを入力して登録を押してください。</li>
+
+
+        </ul>
+
+
+        <div id="wrapper">
+            <div>
+                <label for="template-area">入力欄</label>
+                <textarea v-model="template" class="template-area"></textarea>
+            </div>
+            <div id="then">→</div>
+            <div>
+                <label for="template-area">サンプル</label>
+                <textarea v-model="sampleTemplate" class="template-area"></textarea>
+            </div>
+
+        </div>
+
+        <button type="button" @click="sendTemplate">変更</button><br>
+        <a href="/index">メーラーに戻る</a><br>
+        <a href="/setting">設定へ戻る</a>
+
+
+        
+    </div>
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    template: '',
+                    sampleTemplate:'',
+                    dummyNames:[
+                        {name:'佐藤'},
+                        {name:'田中'},
+                        {name:'山田'},
+                        {name:'中野'},
+                    ]
+
+                }
+            },
+
+            methods: {
+                confirmation() {
+                    console.log('confirmationスタート');
+                    axios.get('/confirmation')
+                    .then(res => {
+                        this.template = res.data.template;
+                    })
+                },
+
+                sendTemplate(){
+                    console.log('sendTemplateスタート');
+                    axios.request({
+                        url: '/sendTemplate',
+                        method: 'post',
+                        data: this.template,
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        }
+                    })
+                    .then(res => {
+                        this.confirmation();                
+                    })
+                }
+            },
+
+            created: function() {
+                console.log('created');
+                this.confirmation();
+            },
+
+            watch: {
+                template(newData, oldData) {
+                    console.log('watchやで')
+                    const inputTemplate = this.template;
+                    this.sampleTemplate = inputTemplate
+                        .replace(/{{numberOfPeople}}/g, this.dummyNames.length)
+                        .replace(/{{name}}/g, this.dummyNames.map(user => user.name).join(', '))
+
+                    // this.sampleTemplate = inputTemplate
+                    //     .replace('{{numberOfPeople}}', this.dummyNames.length)
+                    //     .replace('{{name}}', this.dummyNames.map(user => user.name).join(', '))
+                }
+            },
+        }).mount('#app');
+    </script>
+</body>
+</html>

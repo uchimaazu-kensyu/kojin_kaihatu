@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居残りメーラー</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/setting" id="setting">設定</a>
+        <h2 id="title">居残りメーラー</h2>
+        <table id="member">
+            <tr>
+                <td>
+                    <div class="name-container">
+                        <div v-for="user in users" class="name-item">
+                            <label>
+                                <input type="checkbox" v-bind:id="user.id" v-bind:value="user.id" :checked="user.selectedFlg === 1" @click="selectDetention(user.id)">
+                                <span>{{ user.name }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div>
+            <textarea v-model="template" id="confirmation-area"></textarea>
+        </div>
+        <p><a :href="createEmailLink()" class="btn" @click="createEmailLink">メーラー起動</a></p>
+    </div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                users: [],
+                detentionMember:[],
+                isSelected: false,
+                template: '',
+                subject:'',
+                recipient:'',
+                cc1:'',
+                cc2:'',
+                cc3:'',
+                cc4:'',
+                cc5:'',
+                ccList:[],
+                
+            }
+        },
+
+        methods: {
+
+            //メンバー全員の表示と、標準でチェックついてる人をチェックするもの。
+            getUsers() {
+                console.log('getUsersスタート')
+                axios.get('/getUsers')
+                .then(res => {
+                    this.users = res.data;
+                    console.log(this.users);
+                    this.cheakDetentionMenber();
+                    this.confirmation();
+                });
+            },
+
+
+            //最初に表示するようで、selectedFlgが１の奴を、チェックつけておく。
+            cheakDetentionMenber(){
+                for (let i = 0; i < this.users.length; i++) {
+                        if (this.users[i].selectedFlg == 1) {
+                            this.isSelected = true;
+                        } else {
+                            this.isSelected = false;
+                        }
+                }
+            },
+            
+            //チェックがついてる人をDetetionMember[]にpushする。
+            //とってきたテンプレートに、人数や残るメンバーなどの情報をセット（v-modelなので同時に表示。）。
+            confirmation() {
+                console.log('confirmationスタート');
+                this.tidyUpDetentionMenber();
+                axios.get('/confirmation')
+                .then(res => {
+                    const template = res.data.template;
+                    this.template = template
+                        .replace(/{{name}}/g, this.detentionMember.map(user => user.name).join(', '))
+                        .replace(/{{numberOfPeople}}/g, this.detentionMember.length);
+                    // console.log(this.template);
+                    const getSubject =res.data.subject;
+                    this.subject =getSubject
+                        .replace(/{{numberOfPeople}}/g, this.detentionMember.length)
+                        .replace(/{{name}}/g, this.detentionMember.map(user => user.name).join(', '))
+
+                })
+            },
+
+            getMail() {
+                console.log('getMailスタート');
+                axios.get('/getMail')
+                    .then(res => {
+                    this.recipient = res.data.mail;
+                    for (let i = 1; i <= 5; i++) {
+                        const cc = res.data['cc' + i];
+                        if (cc !== null) {
+                            this.ccList.push(cc);
+                        }
+                        this['cc' + i] = cc;
+                    }
+                    console.log('ccList' + this.ccList);
+                });
+            },
+            //チェックボックスが押されたら起動。
+            //selectedFlgが１なら０、０なら１に。
+            selectDetention(id){
+                if(this.users[id-1].selectedFlg ===0){
+                    this.users[id-1].selectedFlg = 1;
+                    // console.log(this.users[id-1]);
+                }else if(this.users[id-1].selectedFlg ===1){
+                    this.users[id-1].selectedFlg =0;
+                    // console.log(this.users[id-1]);
+                }
+                this.tidyUpDetentionMenber();
+                this.confirmation();
+                
+
+            },
+
+
+            //チェックボックスが押されたら、その時selectedFlgが1のものをdetentionMemberについか。
+            tidyUpDetentionMenber() {
+                this.detentionMember = this.users.filter(user => user.selectedFlg === 1);
+            },
+
+            
+
+
+            createEmailLink() {
+                const text = this.template;
+                const pattern = /{{[^{}]+}}/g;
+                const pattern2 = 'undefined';
+                const pattern3 = 'null';
+                const result = text.match(pattern);
+                const result2 = text.match(pattern2);
+                const result3 = text.match(pattern3);
+                
+                if (result===null && result2===null &&result3 === null) {
+                    let ccParams = this.ccList.map(cc => `${encodeURIComponent(cc)}`).join(',');
+                    let mailtoLink = `mailto:${encodeURIComponent(this.recipient)}?cc=${ccParams}&subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(this.template)}`;
+                    return mailtoLink;
+                    // return `mailto:${encodeURIComponent(this.recipient)}?cc=${encodeURIComponent(this.cc1)}&subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(this.template)}`;
+
+                }
+                alert('不正な値（「{{something}}」、null、undefinedなど）が含まれている可能性があります。適宜訂正してください');
+                return '#'; // メーラーを開かない場合は "#" を返す
+
+
+            },
+            
+
+        },
+
+        // watch: {
+        //     // 内容が変更されるたびに、関数が実行されます。
+        //     selectedReason(newData, oldData) {
+        //         console.log('watchやで')
+        //         console.log(this.selectedReason)
+        //         this.confirmation();
+        //     }
+        // },
+
+        created: function() {
+            console.log('created');
+            this.getUsers();
+            this.getMail();
+
+            
+        },
+
+
+        computed: {
+
+            
+        },
+
+
+
+        mounted() {
+            console.log('mountedまで来たよ。')
+            for (let i = 0; i < this.users.length; i++) {
+                if (this.users[i].selectedFlg == 1) {
+                    this.isSelected = true;
+                    console.log(this.users[i])
+                }
+            }
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>

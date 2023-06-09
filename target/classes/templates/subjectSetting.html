@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居残りメーラー</title>
+    <link rel="stylesheet" href="/subjectSetting.css">
+</head>
+<body>
+    <div id="app">
+
+        <div class="edit-area">
+            <h2 id="title">件名設定</h2>
+            <h3>件名のいじり方説明</h3>
+            <ul>
+                <li>基本的に適当に書いてもらってかまいません</li>
+                <li>残る人の名前を入れたいところに<span style="color:rgb(114, 180, 224)">{{'{{'}}name}}</span>と入力</li>
+                <li>残る人数を入れたいところに<span style="color:rgb(114, 180, 224)">{{'{{'}}numberOfPeople}}</span>と入力してください。</li>
+                <li>（スペース等があってもうまく動作しませんのでご注意ください。）</li>
+                <li>100文字まで登録できます。</li>
+                <li>最初の状態に戻したい場合には、「reset」のみを入力して登録を押してください。</li>
+
+            </ul>
+            <ul  class="example">
+                <li class="example">例）施設利用延長願い（「残る人の名前」、「残る人の人数」名分）としたい場合、</li>
+                <li class="example">　　→「施設利用延長願い（{{'{{'}}name}}、{{'{{'}}numberOfPeople}}名分）」と入力します。</li>
+                <li class="example">サンプルにどのように件名に表示されるのか確認できるので、参考にしてください。名前はダミーです。</li>
+            </ul>
+
+            <div id="wrapper">
+
+                <div class="input-area">
+                    <h3 id="sampletitle">入力</h3>
+
+                    <textarea v-model="subject" class="subject"></textarea>
+                </div>
+
+                <div id="then">→</div>
+
+                <div class="input-area">
+                    <h3 id="title">サンプル</h3>
+                    <textarea v-model="sampleSubject" class="subject"></textarea>
+                </div>
+
+
+            </div>
+
+            <div class="submit">
+                <button type="button" @click="updateSubject">登録</button>
+            </div>
+
+            <a href="/index">メインへ</a><br>
+            <a href="/setting">設定へ戻る</a>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        const app = createApp({
+            data() {
+                return {
+                    subject:'',
+                    sampleSubject:'',
+                    dummyNames:[
+                        {name:'佐藤'},
+                        {name:'田中'},
+                        {name:'山田'},
+                    ]
+                }
+            },
+
+            methods: {
+                getSubject() {
+                    console.log('confirmationスタート');
+                    axios.get('/confirmation')
+                    .then(res => {
+                        this.subject = res.data.subject;
+                    })
+                },
+
+                updateSubject(){
+                    console.log('updateSubjectスタート');
+                    axios.request({
+                        url:'updateSubject',
+                        method:'post',
+                        data:this.subject,
+                        headers:{
+                            'Content-Type':'text/plain'
+                        }
+                    })
+                    .then(res =>{
+                        this.getSubject();
+                    })
+                }
+            },
+
+            created: function() {
+                this.getSubject();
+            },
+            
+            watch: {
+                subject(newData, oldData) {
+                    console.log('watchやで')
+                    const inputSubject = this.subject;
+                    this.sampleSubject = inputSubject
+                        .replace(/{{numberOfPeople}}/g, this.dummyNames.length)
+                        .replace(/{{name}}/g, this.dummyNames.map(user => user.name).join(', '))
+                }
+            },
+        }).mount('#app');
+    </script>
+</body>
+</html>

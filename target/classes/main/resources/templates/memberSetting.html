@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居残りメーラー</title>
+    <link rel="stylesheet" href="/styleMemberSetting.css">
+
+</head>
+<body>
+
+
+
+    <div id="app">
+
+        <h2>居残りメンバーの追加・削除・編集画面です</h2>
+
+        <div class="wrapper">
+            <div class="name-cheak-edit">
+                <table id="member">
+
+                    <tbody>  
+                        <tr class="name-container" v-for="user in users" >
+                            <div  class="name-item"></div>
+                                <td><label v-bind:for="user.id">{{user.name}}</label></td>
+                                <td><input type="radio" v-bind:id="user.id" name="userSelect" v-bind:value="user.id" @click="displayUpdateUser(user.id)"></td>  
+                            </div>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div id="add-edit-area"> 
+                <div id="add-area">
+                    <h3>追加</h3>
+                    <p>名前：<input v-model="addName"></p>
+                    <p>デフォルトでチェック入れるか：<input type="checkbox" name="addUserSelectedFlg" v-model="isSelectedForAdd"></p>
+                    <p><button @click="addUser" >追加</button></p>
+                    
+                    
+                </div>
+
+                <div id="edit-area">
+                    <h3>編集</h3>
+                    <p>id:<input v-model="editId" disabled></p>
+                    <p>名前：<input v-model="editName"></p>
+                    <p>デフォルトでチェック入れるか：<input type="checkbox" name="editUserSelectedFlg" v-model="isSelectedForEdit"></p>
+                    <p><button @click="updateUser" >更新</button><button @click="deleteUser(editId)" >削除</button></p>
+                    <p></p>
+                </div>
+
+            </div>
+        </div>   
+
+
+        <a href="/index">メーラーに戻る</a><br>
+        <a href="/setting">設定へ戻る</a>
+
+
+
+
+
+
+        
+    </div>
+    
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                users: [],
+                isSelectedForAdd: false,
+                isSelectedForEdit: false,
+                addName:'',
+                editId:'',
+                editName:'',
+
+
+            }
+        },
+
+        methods: {
+
+            //メンバー全員の表示と、標準でチェックついてる人をチェックするもの。
+            getUsers() {
+                console.log('getUsersスタート')
+                axios.get('/getUsers')
+                .then(res => {
+                    this.users = res.data;
+                    console.log(this.users);
+                
+                });
+            },
+
+
+            addUser(){
+                console.log('addUserまで来た')
+                if(this.isSelectedForAdd === true){
+                    const addUser={
+                        name:this.addName,
+                        selectedFlg:1
+                    };
+                    axios.post('/addUser',addUser)
+                    .then(res => {
+                        this.getUsers();
+                        this.addName ='';
+                        this.isSelectedForAdd =false;
+                    })
+                }else{
+                    const addUser={
+                        name:this.addName,
+                        selectedFlg:0
+                    };
+                    axios.post('/addUser',addUser)
+                    .then(res => {
+                        this.getUsers();
+                        this.addName ='';
+                    })
+                }
+            },
+
+            displayUpdateUser(id){
+                const targetUser = this.users.find(user => user.id === id);                
+                this.editName = targetUser.name;
+                this.editId = targetUser.id
+                if(targetUser.selectedFlg === 1){
+                    console.log(targetUser.selectedFlg);
+                    this.isSelectedForEdit=true;
+                }else{
+                    console.log(targetUser.selectedFlg);
+                    this.isSelectedForEdit=false;
+                }
+            },
+            updateUser(id){
+                if(this.isSelectedForEdit === true){
+                    const editUser={
+                        id:this.editId,
+                        name:this.editName,
+                        selectedFlg:1
+                    };
+                    axios.put('/updateUser',editUser)
+                    .then(res => {
+                        this.getUsers();
+
+                    });
+                }else{
+                    const editUser={
+                        id:this.editId,
+                        name:this.editName,
+                        selectedFlg:0
+                    };
+                    axios.put('/updateUser',editUser)
+                    .then(res => {
+                        this.getUsers();
+
+                    })
+                }
+
+            },
+
+
+            deleteUser(id){
+                if (window.confirm("削除しますか？")) {
+                    console.log(this.editId);
+                    axios.delete(`deleteUser/${id}`)
+                    .then(res =>{
+                        this.getUsers();
+                        this.editId =''
+                        this.editName =''
+                        this.isSelectedForEdit=false;
+                    });
+                    } else {
+                        console.log("キャンセルが選択されました");
+                    }
+            },
+
+
+
+            
+            
+
+        },
+
+
+
+        created: function() {
+            console.log('created');
+            this.getUsers();
+
+            
+        },
+
+
+
+        mounted() {
+            console.log('mountedまで来たよ。')
+            for (let i = 0; i < this.users.length; i++) {
+                if (this.users[i].selectedFlg == 1) {
+                    this.isSelected = true;
+                    console.log(this.users[i])
+                }
+            }
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>

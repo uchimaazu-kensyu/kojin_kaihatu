@@ -1,0 +1,8 @@
+com\example\mailer\MailerApplication.class
+com\example\mailer\Entity\SendTo.class
+com\example\mailer\Entity\User.class
+com\example\mailer\Service\UserService.class
+com\example\mailer\Controller\TestController.class
+com\example\mailer\Entity\Parts.class
+com\example\mailer\Controller\UserRestController.class
+com\example\mailer\Dao\UserDao.class

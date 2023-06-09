@@ -1,0 +1,40 @@
+body {
+    /* font-size: 20px; */
+    background-color: #fffdee;
+
+}
+
+.template-area{
+    width: 500px;
+    height: 220px;
+}
+
+h2{
+    text-align: center;
+}
+
+ul{
+    list-style:none;
+    margin-bottom: 30px;
+}
+
+label{
+    display: block;
+    font-weight:bold;
+}
+
+a {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #337ab7;
+}
+
+#wrapper{
+    display: flex;
+    align-items: center;
+}
+
+#then{
+    font-size: 30px;
+}
