@@ -29,7 +29,6 @@ public class UserDao {
         var result = jdbcTemplate.query("SELECT * FROM Users ORDER BY id ",
                 new DataClassRowMapper<>(User.class));
 
-        System.out.println(result);
         return result;
     }
 
@@ -37,7 +36,6 @@ public class UserDao {
         List<Parts> result =jdbcTemplate.query("SELECT * FROM parts WHERE id =1",
                 new DataClassRowMapper<>(Parts.class));
 
-        System.out.println(result);
         return result.isEmpty()? null:result.get(0);
     }
 
@@ -46,7 +44,6 @@ public class UserDao {
         List<SendTo> result =jdbcTemplate.query("SELECT * FROM sendto WHERE id =1",
                 new DataClassRowMapper<>(SendTo.class));
 
-        System.out.println(result);
         return result.isEmpty()? null:result.get(0);
     }
 

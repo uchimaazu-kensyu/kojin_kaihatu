@@ -26,7 +26,6 @@ public class UserRestController {
 
     @GetMapping("/getUsers")
     public List<User> getUsers(){
-        System.out.println("getUsers(Javaレストコントローラー)");
         try{
             List<User> userList =userService.findAll();;
             return userList ;
@@ -79,7 +78,6 @@ public class UserRestController {
 
     @DeleteMapping("/deleteUser/{id}")
     public int deleteUser(@PathVariable("id") int id){
-        System.out.println("deleteまで来た");
         int result =userService.deleteUser(id);
         return result;
     }
